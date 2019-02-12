@@ -1,0 +1,231 @@
+<div class="p-non-exfoliate-outer-padding">
+{{#each details.results as |result|}}
+<a href="{{block.data.details.uri}}">  (View in Iris) </a>
+
+<div class="indicator">
+            <div class="tic-gauge-container">
+                <svg x="0" y="0" width="50%" height="50%" viewBox="0 0 55 50">
+                    <g transform="translate(28,25)">
+                        <g>
+                            <circle r="{{elementRadius}}" stroke="#eee" transform="rotate(-90)" fill="#fff"
+                                    stroke-width="{{elementStrokeWidth}}"
+                                    cx="0"
+                                    cy="0"></circle>
+                            {{!-- this is the inner circle --}}
+                            {{!-- stroke=<color> is the inner circle color --}}
+                            <circle stroke-dasharray="{{elementCircumference}}" r="{{elementRadius}}"
+                                    stroke="{{elementColor}}"
+                                    transform="rotate(-90)" fill="none"
+                                    stroke-dashoffset="{{elementStrokeOffset}}"
+                                    stroke-width="{{elementStrokeWidth}}" cx="0"
+                                    cy="0"></circle>
+                            <text text-anchor="middle" x="0" y="5" fill="{{elementColor}}"
+                                  font-size="13">{{result.domain_risk.risk_score}}</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div>
+          <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
+        </div>
+
+        {{#if result.domain_risk.components}}
+          {{#each result.domain_risk.components as |risk|}}
+            <div>
+                <span class="p-key"> Domain Risk Components: </span>
+                <span class="p-value">{{risk.name}}</span>
+            </div>
+          {{/each}}
+        {{/if}}
+
+{{#if result.whois_url}}
+    <div class="description-container">
+        <a href="{{result.whois_url}}">  (View Who Is Data) </a>
+    </div>
+{{/if}}
+
+{{#if result.create_date.value}}
+    <div>
+        <span class="p-key">Created Date: </span>
+        <span class="p-value">{{result.create_date.value}}</span>
+    </div>
+{{/if}}
+
+{{#if result.expiration_date.value}}
+    <div>
+        <span class="p-key">Expiration Date: </span>
+        <span class="p-value">{{result.expiration_date.value}}</span>
+    </div>
+{{/if}}
+
+
+
+{{#if result.spf_info}}
+<div>
+  <span class="p-title">{{fa-icon "pencil square" fixedWidth=true}} SSL Information</span>
+</div>
+{{/if}}
+
+
+{{#if result.ssl_info}}
+  {{#each result.ssl_info as |ssl|}}
+
+    <div>
+        <span class="p-key"> SSL Hash: </span>
+        <span class="p-value">{{ssl.hash.value}}</span>
+    </div>
+    <div>
+        <span class="p-key"> SSL Subject: </span>
+        <span class="p-value">{{ssl.subject.value}}</span>
+    </div>
+
+    <div>
+        <span class="p-key"> SSL Organization: </span>
+        <span class="p-value">{{ssl.organization.value}}</span>
+    </div>
+  {{/each}}
+{{/if}}
+
+<div>
+  <span class="p-title">{{fa-icon "globe" fixedWidth=true}} IP Details</span>
+</div>
+
+{{#if result.ip}}
+  {{#each result.ip as |ip|}}
+    <div>
+        <span class="p-key"> IP Address: </span>
+        <span class="p-value">{{ip.address.value}}</span>
+    </div>
+    <div>
+        {{#if ip.asn}}
+        {{#each ip.asn as |asn|}}
+        <span class="p-key"> ASN: </span>
+        <span class="p-value">{{asn.value}}</span>
+        {{/each}}
+        {{/if}}
+    </div>
+    <div>
+        <span class="p-key"> ISP: </span>
+        <span class="p-value">{{ip.isp.value}}</span>
+    </div>
+  {{/each}}
+{{/if}}
+
+<div>
+  <span class="p-title">{{fa-icon "envelope" fixedWidth=true}} MX Details</span>
+</div>
+
+{{#if result.mx}}
+  {{#each result.mx as |mx|}}
+    <div>
+        <span class="p-key"> MX Host: </span>
+        <span class="p-value">{{mx.host.value}}</span>
+    </div>
+    <div>
+        <span class="p-key"> MX Domain: </span>
+        <span class="p-value">{{mx.domain.value}}</span>
+    </div>
+  {{/each}}
+{{/if}}
+
+<div>
+  <span class="p-title">{{fa-icon "server" fixedWidth=true}} Name Servers</span>
+</div>
+
+{{#if result.name_server}}
+  {{#each result.name_server as |name|}}
+    <div>
+        <span class="p-key"> Name Server Host: </span>
+        <span class="p-value">{{name.host.value}}</span>
+    </div>
+    <div>
+        <span class="p-key"> Name Server Domain: </span>
+        <span class="p-value">{{name.domain.value}}</span>
+    </div>
+    <div>
+        {{#if name.ip}}
+        {{#each name.ip as |ip|}}
+        <span class="p-key"> Name Server IP: </span>
+        <span class="p-value">{{ip.value}}</span>
+        {{/each}}
+        {{/if}}
+    </div>
+  {{/each}}
+{{/if}}
+
+
+<div>
+  <span class="p-title">{{fa-icon "registered" fixedWidth=true}} Registration Details</span>
+</div>
+
+{{#if result.registrant_org}}
+    <div>
+        <span class="p-key">Registrant Organization: </span>
+        <span class="p-value">{{result.registrant_org.value}}</span>
+    </div>
+{{/if}}
+
+{{#if result.registrar}}
+    <div>
+        <span class="p-key">Registrar: </span>
+        <span class="p-value">{{result.registrar.value}}</span>
+    </div>
+{{/if}}
+
+{{#if result.registrant_contact.name.value}}
+    <div>
+        <span class="p-key"> RegistrantContact Name: </span>
+        <span class="p-value">{{result.registrant_contact.name.value}}</span>
+    </div>
+{{/if}}
+
+{{#if result.registrant_contact.org.value}}
+    <div>
+        <span class="p-key"> Registrant Contact Organization: </span>
+        <span class="p-value">{{result.registrant_contact.org.value}}</span>
+    </div>
+{{/if}}
+
+{{#if result.registrant_contact.city.value}}
+    <div>
+        <span class="p-key">Registrant Contact City and Country : </span>
+        <span class="p-value">{{result.registrant_contact.city.value}}, {{result.registrant_contact.country.value}}</span>
+    </div>
+{{/if}}
+
+<div>
+  <span class="p-title">{{fa-icon "address-book" fixedWidth=true}} Contact Information</span>
+</div>
+
+{{#if result.email_domain}}
+  {{#each result.email_domain as |domain|}}
+    <div>
+        <span class="p-key">Email Domain: </span>
+        <span class="p-value">{{domain.value}}</span>
+    </div>
+  {{/each}}
+{{/if}}
+
+{{#if result.soa_email}}
+  {{#each result.soa_email as |email|}}
+    <div>
+        <span class="p-key"> SOA Email: </span>
+        <span class="p-value">{{email.value}}</span>
+    </div>
+  {{/each}}
+{{/if}}
+
+{{#if result.additional_whois_email}}
+  {{#each result.additional_whois_email as |email|}}
+    <div>
+        <span class="p-key"> SOA Email: </span>
+        <span class="p-value">{{email.value}}</span>
+    </div>
+  {{/each}}
+{{/if}}
+
+
+{{/each}}
+</div>
