@@ -14,6 +14,7 @@ let domainBlacklistRegex = null;
 let ipBlacklistRegex = null;
 
 const BASE_URI = "https://api.domaintools.com/v1/iris-investigate/?";
+const ENRICH_URI = "https://api.domaintools.com/v1/iris-enrich/?"
 const MAX_DOMAIN_LABEL_LENGTH = 63;
 const MAX_ENTITY_LENGTH = 100;
 const LOOKUP_URI = "https://research.domaintools.com/iris/search/?q="
@@ -164,7 +165,7 @@ function _isEntityBlacklisted(entityObj, options) {
   return false;
 }
 
-function _getUrl(entityObj) {
+function _getUrlInvestigate(entityObj) {
   let IRISEntityType = null;
   // map entity object type to the IRIS REST API type
   switch (entityObj.type) {
@@ -172,7 +173,7 @@ function _getUrl(entityObj) {
       IRISEntityType = "domain";
       break;
     case "IPv4":
-      IRISEntityType = "IPv4";
+      IRISEntityType = "ip";
       break;
   }
   return `${BASE_URI}${IRISEntityType}=${entityObj.value.toLowerCase()}`;
@@ -181,7 +182,7 @@ function _getUrl(entityObj) {
 function _getRequestOptions(entityObj, options) {
   return {
     uri:
-      _getUrl(entityObj) +
+      _getUrlInvestigate(entityObj) +
       "&api_username=" +
       options.apiName +
       "&api_key=" +
@@ -268,12 +269,38 @@ function _lookupEntityInvestigate(entityObj, options, cb) {
   });
 }
 
+function _getUrlEnrich(entityObj) {
+  let IRISEntityType = null;
+  // map entity object type to the IRIS REST API type
+  switch (entityObj.type) {
+    case "domain":
+      IRISEntityType = "domain";
+      break;
+    case "IPv4":
+      IRISEntityType = "ip";
+      break;
+  }
+  return `${ENRICH_URI}${IRISEntityType}=${entityObj.value.toLowerCase()}`;
+}
+
+function _getRequestOptionsEnrich(entityObj, options) {
+  return {
+    uri:
+      _getUrlEnrich(entityObj) +
+      "&api_username=" +
+      options.apiName +
+      "&api_key=" +
+      options.apiKey,
+    method: "POST",
+    json: true
+  };
+}
 function _lookupEntityEnrich(entityObj, options, cb) {
   Logger.trace("Logging if Enrich is Running");
 
   let minScore = parseInt(options.minScore, 10);
 
-  const requestOptions = _getRequestOptions(entityObj, options);
+  const requestOptions = _getRequestOptionsEnrich(entityObj, options);
 
   const researchUri = LOOKUP_URI + entityObj.value;
   requestWithDefaults(requestOptions, function(err, response, body) {

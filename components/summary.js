@@ -3,28 +3,30 @@
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias("block.data.details.body.response"),
 
-  riskTags: Ember.computed("details", function() {
-    let riskTags = Ember.A();
-    this.get("details.results").forEach(function(item) {
-      if(item.domain_risk.risk_score !== null){
-      riskTags.push("DomainTools Risk Score: " + item.domain_risk.risk_score);
-    }
-    });
 
-    return riskTags;
+  riskTags: Ember.computed("details", function() {
+    let severityTags = Ember.A();
+    let severityLevel = Ember.A();
+    this.get("details.results").forEach(function(item) {
+      if(item.domain_risk.risk_score !== undefined && item.domain_risk.risk_score !== null){
+      severityLevel.push(item.domain_risk.risk_score);
+    }
+        });
+    let severity = [... new Set(severityLevel)];
+    severityTags.push("Highest Risk Score: " + Math.max(... severity));
+    return severityTags;
   }),
 
   summaryTags: Ember.computed("details", function() {
-    let summaryTags = Ember.A();
+    let severityTags = Ember.A();
+    let severityLevel = Ember.A();
     this.get("details.results").forEach(function(item) {
-      let googleValue = item.google_analytics.value;
-      if(googleValue.length !== 0) {
-        summaryTags.push(
-        "Google Anayltics Score: " + googleValue
-      );
+      if(item.google_analytics.value !== undefined && item.google_analytics.value !== null){
+      severityLevel.push(item.google_analytics.value);
     }
-    });
-
-    return summaryTags;
+        });
+    let severity = [... new Set(severityLevel)];
+    severityTags.push("Highest Google Analytics Score: " + Math.max(... severity));
+    return severityTags;
   })
 });
