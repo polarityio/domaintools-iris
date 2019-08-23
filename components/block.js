@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias('block.data.details.body.response'),
 
@@ -16,41 +16,41 @@ polarity.export = PolarityComponent.extend({
   elementRadius: 20,
   elementStrokeWidth: 4,
 
-  elementColor: Ember.computed('details', function(){
+  elementColor: Ember.computed('details', function() {
     let riskScores = Ember.A();
-    this.get("details.results").forEach(function(item) {
+    this.get('details.results').forEach(function(item) {
       riskScores.push(item.domain_risk.risk_score);
     });
-      return this._getThreatColor(riskScores[0]);
+    return this._getThreatColor(riskScores[0]);
   }),
 
-  elementStrokeOffset: Ember.computed('details', 'elementCircumference', function(){
+  elementStrokeOffset: Ember.computed('details', 'elementCircumference', function() {
     let riskScores = Ember.A();
-    this.get("details.results").forEach(function(item) {
+    this.get('details.results').forEach(function(item) {
       riskScores.push(item.domain_risk.risk_score);
     });
     return this._getStrokeOffset(riskScores[0], this.get('elementCircumference'));
   }),
 
-  threatCircumference: Ember.computed('threatRadius', function () {
-      return 2 * Math.PI * this.get('threatRadius');
+  threatCircumference: Ember.computed('threatRadius', function() {
+    return 2 * Math.PI * this.get('threatRadius');
   }),
 
-  elementCircumference: Ember.computed('elementCircumference', function(){
-      return 2 * Math.PI * this.get('elementRadius');
+  elementCircumference: Ember.computed('elementCircumference', function() {
+    return 2 * Math.PI * this.get('elementRadius');
   }),
 
-  _getStrokeOffset(ticScore, circumference){
-      let progress = ticScore / 100;
-      return circumference * (1 - progress);
+  _getStrokeOffset(ticScore, circumference) {
+    let progress = ticScore / 100;
+    return circumference * (1 - progress);
   },
-  _getThreatColor(ticScore){
-      if (ticScore >= 75) {
-          return this.get('redThreat');
-      } else if (ticScore >= 50) {
-          return this.get('yellowThreat');
-      } else {
-          return this.get('greenThreat');
-      }
+  _getThreatColor(ticScore) {
+    if (ticScore >= 75) {
+      return this.get('redThreat');
+    } else if (ticScore >= 50) {
+      return this.get('yellowThreat');
+    } else {
+      return this.get('greenThreat');
+    }
   }
 });
