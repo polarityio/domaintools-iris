@@ -1,12 +1,11 @@
 {
   "main": "./integration.js",
   "name": "DomainToolsIRIS",
-  "version": "3.0.0-beta",
+  "version": "3.0.1-beta",
   "private": true,
   "dependencies": {
-    "async": "^2.5",
-    "bunyan": "^1.8.12",
+    "async": "^2.6",
     "lodash": "^4.17",
-    "request": "^2.83"
+    "request": "^2.88"
   }
 }
