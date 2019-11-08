@@ -9,15 +9,13 @@ const fs = require('fs');
 let Logger;
 let requestWithDefaults;
 let previousDomainRegexAsString = '';
-let previousIpRegexAsString = '';
 let domainBlacklistRegex = null;
-let ipBlacklistRegex = null;
 
-const BASE_URI = 'https://api.domaintools.com/v1/iris-investigate/?';
-const ENRICH_URI = 'https://api.domaintools.com/v1/iris-enrich/?';
+const BASE_URI = 'https://api.domaintools.com/v1/iris-investigate';
 const MAX_DOMAIN_LABEL_LENGTH = 63;
 const MAX_ENTITY_LENGTH = 100;
-const LOOKUP_URI = 'https://research.domaintools.com/iris/search/?q=';
+const MAX_ENTITIES_TO_BULK_LOOKUP = 30;
+const WEB_EXTERNAL_URI = 'https://research.domaintools.com/iris/search/?q=';
 
 function _setupRegexBlacklists(options) {
   if (options.domainBlacklistRegex !== previousDomainRegexAsString && options.domainBlacklistRegex.length === 0) {
@@ -31,57 +29,46 @@ function _setupRegexBlacklists(options) {
       domainBlacklistRegex = new RegExp(options.domainBlacklistRegex, 'i');
     }
   }
+}
 
-  if (options.ipBlacklistRegex !== previousIpRegexAsString && options.ipBlacklistRegex.length === 0) {
-    Logger.debug('Removing IP Blacklist Regex Filtering');
-    previousIpRegexAsString = '';
-    ipBlacklistRegex = null;
-  } else {
-    if (options.ipBlacklistRegex !== previousIpRegexAsString) {
-      previousIpRegexAsString = options.ipBlacklistRegex;
-      Logger.debug({ ipBlacklistRegex: previousIpRegexAsString }, 'Modifying IP Blacklist Regex');
-      ipBlacklistRegex = new RegExp(options.ipBlacklistRegex, 'i');
-    }
+function chunk(arr, chunkSize) {
+  const R = [];
+  for (let i = 0, len = arr.length; i < len; i += chunkSize) {
+    R.push(arr.slice(i, i + chunkSize));
   }
+  return R;
 }
 
 function doLookup(entities, options, cb) {
   let lookupResults = [];
+  let entityLookup = {};
+  let entityLists = [];
 
   _setupRegexBlacklists(options);
 
+  entities.forEach((entityObj) => {
+    if (_isInvalidEntity(entityObj) || _isEntityBlacklisted(entityObj, options)) {
+      return;
+    }
+
+    entityLookup[entityObj.value.toLowerCase()] = entityObj;
+    entityLists.push(entityObj.value.toLowerCase());
+  });
+
+  entityLists = chunk(entityLists, MAX_ENTITIES_TO_BULK_LOOKUP);
+  Logger.debug({ entityLists }, 'Entity Lists');
+
   async.each(
-    entities,
-    function(entityObj, next) {
-      if (options.enrich === true) {
-        if (_isInvalidEntity(entityObj) || _isEntityBlacklisted(entityObj, options)) {
-          next(null);
+    entityLists,
+    (entityList, next) => {
+      _lookupEntityInvestigate(entityList, entityLookup, options, function(err, results) {
+        if (err) {
+          next(err);
         } else {
-          _lookupEntityEnrich(entityObj, options, function(err, result) {
-            if (err) {
-              next(err);
-            } else {
-              lookupResults.push(result);
-              Logger.debug({ result: result }, 'Checking the result values for Enrich');
-              next(null);
-            }
-          });
-        }
-      } else {
-        if (_isInvalidEntity(entityObj) || _isEntityBlacklisted(entityObj, options)) {
+          lookupResults = lookupResults.concat(results);
           next(null);
-        } else {
-          _lookupEntityInvestigate(entityObj, options, function(err, result) {
-            if (err) {
-              next(err);
-            } else {
-              lookupResults.push(result);
-              Logger.debug({ result: result }, 'Checking the result values of Investigate');
-              next(null);
-            }
-          });
         }
-      }
+      });
     },
     function(err) {
       cb(err, lookupResults);
@@ -118,15 +105,6 @@ function _isEntityBlacklisted(entityObj, options) {
     return true;
   }
 
-  if (entityObj.isIPv4 && !entityObj.isPrivateIP) {
-    if (ipBlacklistRegex !== null) {
-      if (ipBlacklistRegex.test(entityObj.value)) {
-        Logger.debug({ ip: entityObj.value }, 'Blocked BlackListed IP Lookup');
-        return true;
-      }
-    }
-  }
-
   if (entityObj.isDomain) {
     if (domainBlacklistRegex !== null) {
       if (domainBlacklistRegex.test(entityObj.value)) {
@@ -139,195 +117,121 @@ function _isEntityBlacklisted(entityObj, options) {
   return false;
 }
 
-function _getUrlInvestigate(entityObj) {
-  let IRISEntityType = null;
-  // map entity object type to the IRIS REST API type
-  switch (entityObj.type) {
-    case 'domain':
-      IRISEntityType = 'domain';
-      break;
-    case 'IPv4':
-      IRISEntityType = 'ip';
-      break;
-  }
-  return `${BASE_URI}${IRISEntityType}=${entityObj.value.toLowerCase()}`;
-}
-
-function _getRequestOptions(entityObj, options) {
-  return {
-    uri: _getUrlInvestigate(entityObj) + '&api_username=' + options.apiName + '&api_key=' + options.apiKey,
+function _getRequestOptions(entityList, options) {
+  let requestOptions = {
+    uri: BASE_URI,
+    qs: {
+      api_username: options.apiName,
+      api_key: options.apiKey,
+      domain: entityList.join(',')
+    },
     method: 'POST',
     json: true
   };
+
+  return requestOptions;
 }
 
-function _lookupEntityInvestigate(entityObj, options, cb) {
-  Logger.trace('Logging if Investigate is Running');
-  const requestOptions = _getRequestOptions(entityObj, options);
+function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
+  const lookupResults = [];
+  const requestOptions = _getRequestOptions(entityList, options);
 
-  let minScore = parseInt(options.minScore, 10);
+  Logger.debug({ requestOptions }, 'Request Options');
 
-  const researchUri = LOOKUP_URI + entityObj.value;
   requestWithDefaults(requestOptions, function(err, response, body) {
-    let errorObject = _isApiError(err, response, body, entityObj.value);
+    const errorObject = _isApiError(err, response, body, entityList);
     if (errorObject) {
-      cb(errorObject);
-      return;
+      return cb(errorObject);
     }
 
     if (_isLookupMiss(response, body)) {
-      return cb(null, {
-        entity: entityObj,
-        data: null
+      entityList.forEach((entity) => {
+        lookupResults.push({
+          entity: entityLookup[entity],
+          data: null
+        });
       });
+
+      return cb(null, lookupResults);
     }
 
     if (body.response.limit_exceeded === true) {
-      return cb('API Limit Exceeded', {
-        entity: entityObj,
-        data: null
-      });
-      return;
+      return cb('API Limit Exceeded');
     }
-
-    Logger.debug({ body: body, entity: entityObj.value }, 'Printing out the results of Body ');
 
     if (_.isNull(body) || _.isEmpty(body.response) || body.response.results_count === 0) {
-      cb(null, {
-        entity: entityObj,
-        data: null // this entity will be cached as a miss
+      entityList.forEach((entity) => {
+        lookupResults.push({
+          entity: entityLookup[entity],
+          data: null
+        });
       });
-      return;
+
+      Logger.debug('Body is null');
+      return cb(null, lookupResults);
     }
 
-    let scores = [];
-
-    body.response.results.forEach(function(a) {
-      scores.push(a.domain_risk.risk_score);
-    });
-
-    let score = scores[0];
-
-    if (score < minScore) {
-      cb(null, {
-        entity: entityObj,
-        data: null // this entity will be cached as a miss
-      });
-      return;
-    }
-
-    // The lookup results returned is an array of lookup objects with the following format
-    cb(null, {
-      // Required: This is the entity object passed into the integration doLookup method
-      entity: entityObj,
-      // Required: An object containing everything you want passed to the template
-      data: {
-        // Required: These are the tags that are displayed in your template
-        summary: [],
-        // Data that you want to pass back to the notification window details block
-        details: {
-          body: body,
-          uri: researchUri
+    body.response.results.forEach((result) => {
+      let lookupEntity = _getEntityObjFromResult(entityLookup, result);
+      if (lookupEntity) {
+        if (result.domain_risk.risk_score < options.minScore) {
+          lookupResults.push({
+            entity: lookupEntity,
+            data: null
+          });
+        } else {
+          lookupResults.push({
+            entity: lookupEntity,
+            data: {
+              summary: [],
+              details: {
+                result,
+                uri: WEB_EXTERNAL_URI + result.domain
+              }
+            }
+          });
         }
       }
     });
+
+    // Any domains that didn't have a hit will be listed in the `missing_domains` array property
+    body.response.missing_domains.forEach((missingDomain) => {
+      let lookupEntity = entityLookup[missingDomain];
+      if (lookupEntity) {
+        lookupResults.push({
+          entity: lookupEntity,
+          data: null
+        });
+      }
+    });
+
+    cb(null, lookupResults);
   });
 }
 
-function _getUrlEnrich(entityObj) {
-  let IRISEntityType = null;
-  // map entity object type to the IRIS REST API type
-  switch (entityObj.type) {
-    case 'domain':
-      IRISEntityType = 'domain';
-      break;
-    case 'IPv4':
-      IRISEntityType = 'ip';
-      break;
+/**
+ * In general we can match up the result domain with our entity object by using the result.domain field.
+ * However, in cases where the domain is internationalized (tld is prepended with `xn--`), the result.domain
+ * field will have the unicode representatino of the domain which will not match our lookup entity.  In this
+ * case we need to parse the `whois_url` which will have the form of:
+ *
+ * "https://whois.domaintools.com/<domain-in-plain-text-format>"
+ *
+ * We can grab the domain in plain text format here and then match it up in our entityLookup to get the
+ * entity object that the result maps to.
+ *
+ * @param entityLookup
+ * @param result
+ * @returns {*}
+ * @private
+ */
+function _getEntityObjFromResult(entityLookup, result) {
+  let entity = entityLookup[result.domain];
+  if (entity) {
+    return entity;
   }
-  return `${ENRICH_URI}${IRISEntityType}=${entityObj.value.toLowerCase()}`;
-}
-
-function _getRequestOptionsEnrich(entityObj, options) {
-  return {
-    uri: _getUrlEnrich(entityObj) + '&api_username=' + options.apiName + '&api_key=' + options.apiKey,
-    method: 'POST',
-    json: true
-  };
-}
-function _lookupEntityEnrich(entityObj, options, cb) {
-  Logger.trace('Logging if Enrich is Running');
-
-  let minScore = parseInt(options.minScore, 10);
-
-  const requestOptions = _getRequestOptionsEnrich(entityObj, options);
-
-  const researchUri = LOOKUP_URI + entityObj.value;
-  requestWithDefaults(requestOptions, function(err, response, body) {
-    let errorObject = _isApiError(err, response, body, entityObj.value);
-    if (errorObject) {
-      cb(errorObject);
-      return;
-    }
-
-    if (_isLookupMiss(response, body)) {
-      cb(null, {
-        entity: entityObj,
-        data: null
-      });
-      return;
-    }
-
-    if (body.response.limit_exceeded === true) {
-      cb('API Limit Exceeded', {
-        entity: entityObj,
-        data: null
-      });
-      return;
-    }
-
-    Logger.trace({ body: body, entity: entityObj.value }, 'Printing out the results of Body ');
-
-    if (_.isNull(body) || _.isEmpty(body.response) || body.response.results_count === 0) {
-      cb(null, {
-        entity: entityObj,
-        data: null // this entity will be cached as a miss
-      });
-      return;
-    }
-
-    let scores = [];
-
-    body.response.results.forEach(function(a) {
-      scores.push(a.domain_risk.risk_score);
-    });
-
-    let score = scores[0];
-
-    if (score < minScore || score === undefined) {
-      cb(null, {
-        entity: entityObj,
-        data: null // this entity will be cached as a miss
-      });
-      return;
-    }
-
-    // The lookup results returned is an array of lookup objects with the following format
-    cb(null, {
-      // Required: This is the entity object passed into the integration doLookup method
-      entity: entityObj,
-      // Required: An object containing everything you want passed to the template
-      data: {
-        // Required: These are the tags that are displayed in your template
-        summary: [],
-        // Data that you want to pass back to the notification window details block
-        details: {
-          body: body,
-          uri: researchUri
-        }
-      }
-    });
-  });
+  let tokens = result.whois_url.split('/');
+  return entityLookup[tokens[tokens.length - 1]];
 }
 
 function _isLookupMiss(response, body) {
@@ -340,7 +244,7 @@ function _isLookupMiss(response, body) {
   );
 }
 
-function _isApiError(err, response, body, entityValue) {
+function _isApiError(err, response, body, entityLookupList) {
   if (err) {
     return {
       detail: 'Error executing HTTP request',
@@ -359,7 +263,7 @@ function _isApiError(err, response, body, entityValue) {
       {
         err: err,
         body: body,
-        entityValue: entityValue
+        entityValue: entityLookupList
       }
     );
   }
@@ -455,6 +359,10 @@ function startup(logger) {
 
   if (typeof config.request.proxy === 'string' && config.request.proxy.length > 0) {
     defaults.proxy = config.request.proxy;
+  }
+
+  if (typeof config.request.rejectUnauthorized === 'boolean') {
+    defaults.rejectUnauthorized = config.request.rejectUnauthorized;
   }
 
   requestWithDefaults = request.defaults(defaults);

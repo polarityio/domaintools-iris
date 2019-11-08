@@ -1,6 +1,7 @@
 'use strict';
 polarity.export = PolarityComponent.extend({
-  details: Ember.computed.alias('block.data.details.body.response'),
+  details: Ember.computed.alias('block.data.details'),
+  result: Ember.computed.alias('details.result'),
 
   redThreat: '#fa5843',
   greenThreat: '#7dd21b',
@@ -17,19 +18,11 @@ polarity.export = PolarityComponent.extend({
   elementStrokeWidth: 4,
 
   elementColor: Ember.computed('details', function() {
-    let riskScores = Ember.A();
-    this.get('details.results').forEach(function(item) {
-      riskScores.push(item.domain_risk.risk_score);
-    });
-    return this._getThreatColor(riskScores[0]);
+    return this._getThreatColor(this.result.domain_risk.risk_score);
   }),
 
   elementStrokeOffset: Ember.computed('details', 'elementCircumference', function() {
-    let riskScores = Ember.A();
-    this.get('details.results').forEach(function(item) {
-      riskScores.push(item.domain_risk.risk_score);
-    });
-    return this._getStrokeOffset(riskScores[0], this.get('elementCircumference'));
+    return this._getStrokeOffset(this.result.domain_risk.risk_score, this.elementCircumference);
   }),
 
   threatCircumference: Ember.computed('threatRadius', function() {
