@@ -283,23 +283,22 @@ function validateOptions(userOptions, cb) {
     });
   }
 
+  if (
+    typeof userOptions.apiName.value !== 'string' ||
+    (typeof userOptions.apiName.value === 'string' && userOptions.apiName.value.length === 0)
+  ) {
+    errors.push({
+      key: 'apiName',
+      message: 'You must provide a DomainTools API Username'
+    });
+  }
+
   if (typeof userOptions.domainBlacklistRegex.value === 'string' && userOptions.domainBlacklistRegex.value.length > 0) {
     try {
       new RegExp(userOptions.domainBlacklistRegex.value);
     } catch (error) {
       errors.push({
         key: 'domainBlacklistRegex',
-        message: error.toString()
-      });
-    }
-  }
-
-  if (typeof userOptions.ipBlacklistRegex.value === 'string' && userOptions.ipBlacklistRegex.value.length > 0) {
-    try {
-      new RegExp(userOptions.ipBlacklistRegex.value);
-    } catch (e) {
-      errors.push({
-        key: 'ipBlacklistRegex',
         message: error.toString()
       });
     }
