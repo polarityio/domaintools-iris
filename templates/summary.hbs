@@ -1,12 +1,12 @@
-{{#each riskTags as |tag|}}
+{{#unless (is-empty result.domain_risk.risk_score)}}
     <span class="integration-summary-tag integration-background-color integration-border-color">
        <span class="acronym integration-text-bold-color">{{block.acronym}}</span>
-       <span class="integration-text-color">{{tag}}</span>
+       <span class="integration-text-color">Risk Score: {{result.domain_risk.risk_score}}</span>
     </span>
-{{/each}}
-{{#each summaryTags as |tag|}}
+{{/unless}}
+{{#each result.domain_risk.components as | risk |}}
     <span class="integration-summary-tag integration-background-color integration-border-color">
        <span class="acronym integration-text-bold-color">{{block.acronym}}</span>
-       <span class="integration-text-color">{{tag}}</span>
+       <span class="integration-text-color">{{humanize risk.name}}</span>
     </span>
 {{/each}}

@@ -1,12 +1,12 @@
-<div class="p-non-exfoliate-outer-padding">
-
-<a href="{{block.data.details.uri}}">  (View in Iris) </a>
-
-{{#each details.results as |result|}}
+<a class="p-link" href="{{block.data.details.uri}}">  View in Iris {{fa-icon "external-link-square" class="external-icon"}} </a>
+|
+{{#if result.whois_url}}
+    <a class="p-link" href="{{result.whois_url}}">View Whois Data {{fa-icon "external-link-square" class="external-icon"}} </a>
+{{/if}}
 
 <div class="indicator">
             <div class="tic-gauge-container">
-                <svg x="0" y="0" width="50%" height="50%" viewBox="0 0 55 50">
+                <svg x="0" y="0" width="30%" height="30%" viewBox="0 0 55 50">
                     <g transform="translate(28,25)">
                         <g>
                             <circle r="{{elementRadius}}" stroke="#eee" transform="rotate(-90)" fill="#fff"
@@ -29,25 +29,6 @@
             </div>
         </div>
 
-        <div>
-          <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
-        </div>
-
-        {{#if result.domain_risk.components}}
-          {{#each result.domain_risk.components as |risk|}}
-            <div>
-                <span class="p-key"> Domain Risk Components: </span>
-                <span class="p-value">{{risk.name}}</span>
-            </div>
-          {{/each}}
-        {{/if}}
-
-{{#if result.whois_url}}
-    <div class="description-container">
-        <a href="{{result.whois_url}}">  (View Who Is Data) </a>
-    </div>
-{{/if}}
-
 {{#if result.create_date.value}}
     <div>
         <span class="p-key">Created Date: </span>
@@ -62,18 +43,28 @@
     </div>
 {{/if}}
 
+{{#if result.domain_risk.components}}
+    <div>
+        <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
+    </div>
 
+    {{#each result.domain_risk.components as |risk|}}
+    <div>
+        <span class="p-key">Risk Name: </span>
+        <span class="p-value">{{risk.name}}</span>
+    </div>
+    {{/each}}
+{{/if}}
 
 {{#if result.spf_info}}
 <div>
-  <span class="p-title">{{fa-icon "pencil square" fixedWidth=true}} SSL Information</span>
+  <span class="p-title">{{fa-icon "lock" fixedWidth=true}} SSL Information</span>
 </div>
 {{/if}}
 
 
 {{#if result.ssl_info}}
   {{#each result.ssl_info as |ssl|}}
-
     <div>
         <span class="p-key"> SSL Hash: </span>
         <span class="p-value">{{ssl.hash.value}}</span>
@@ -115,12 +106,12 @@
   {{/each}}
 {{/if}}
 
-<div>
-  <span class="p-title">{{fa-icon "envelope" fixedWidth=true}} MX Details</span>
-</div>
-
 {{#if result.mx}}
-  {{#each result.mx as |mx|}}
+    <div>
+      <span class="p-title">{{fa-icon "envelope" fixedWidth=true}} MX Details</span>
+    </div>
+
+    {{#each result.mx as |mx|}}
     <div>
         <span class="p-key"> MX Host: </span>
         <span class="p-value">{{mx.host.value}}</span>
@@ -129,15 +120,15 @@
         <span class="p-key"> MX Domain: </span>
         <span class="p-value">{{mx.domain.value}}</span>
     </div>
-  {{/each}}
+    {{/each}}
 {{/if}}
 
-<div>
-  <span class="p-title">{{fa-icon "server" fixedWidth=true}} Name Servers</span>
-</div>
-
 {{#if result.name_server}}
-  {{#each result.name_server as |name|}}
+    <div>
+      <span class="p-title">{{fa-icon "server" fixedWidth=true}} Name Servers</span>
+    </div>
+
+    {{#each result.name_server as |name|}}
     <div>
         <span class="p-key"> Name Server Host: </span>
         <span class="p-value">{{name.host.value}}</span>
@@ -154,7 +145,7 @@
         {{/each}}
         {{/if}}
     </div>
-  {{/each}}
+    {{/each}}
 {{/if}}
 
 
@@ -178,7 +169,7 @@
 
 {{#if result.registrant_contact.name.value}}
     <div>
-        <span class="p-key"> RegistrantContact Name: </span>
+        <span class="p-key"> Registrant Contact Name: </span>
         <span class="p-value">{{result.registrant_contact.name.value}}</span>
     </div>
 {{/if}}
@@ -227,7 +218,3 @@
     </div>
   {{/each}}
 {{/if}}
-
-
-{{/each}}
-</div>
