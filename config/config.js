@@ -24,7 +24,7 @@ module.exports = {
    * @optional
    */
   description: 'DomainTools IRIS .',
-  entityTypes: ['IPv4', 'domain'],
+  entityTypes: ['domain'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
@@ -59,20 +59,24 @@ module.exports = {
   },
   request: {
     // Provide the path to your certFile. Leave an empty string to ignore this option.
-    // Relative paths are relative to the METD integration's root directory
+    // Relative paths are relative to the integration's root directory
     cert: '',
     // Provide the path to your private key. Leave an empty string to ignore this option.
-    // Relative paths are relative to the METD integration's root directory
+    // Relative paths are relative to the integration's root directory
     key: '',
     // Provide the key passphrase if required.  Leave an empty string to ignore this option.
-    // Relative paths are relative to the METD integration's root directory
+    // Relative paths are relative to the integration's root directory
     passphrase: '',
     // Provide the Certificate Authority. Leave an empty string to ignore this option.
-    // Relative paths are relative to the METD integration's root directory
+    // Relative paths are relative to the integration's root directory
     ca: '',
     // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
     // the url parameter (by embedding the auth info in the uri)
-    proxy: ''
+    proxy: '',
+    // If set to false, the integration will ignore SSL errors.  This will allow the integration to connect
+    // to servers without valid SSL certificates.  Please note that we do NOT recommending setting this
+    //to false in a production environment.
+    rejectUnauthorized: false
   },
   logging: {
     level: 'info' //trace, debug, info, warn, error, fatal
@@ -86,15 +90,6 @@ module.exports = {
    */
   options: [
     {
-      key: 'apiKey',
-      name: 'API Key',
-      description: 'DomainTools API Key',
-      default: '',
-      type: 'text',
-      userCanEdit: true,
-      adminOnly: false
-    },
-    {
       key: 'apiName',
       name: 'API Username',
       description: 'DomainTools API Username',
@@ -104,18 +99,27 @@ module.exports = {
       adminOnly: false
     },
     {
+      key: 'apiKey',
+      name: 'API Key',
+      description: 'DomainTools API Key',
+      default: '',
+      type: 'password',
+      userCanEdit: true,
+      adminOnly: false
+    },
+    {
       key: 'minScore',
       name: 'Minimum Iris Risk Score',
       description: 'Minimum score to display in the Polarity overlay window',
-      default: '40',
-      type: 'text',
+      default: 0,
+      type: 'number',
       userCanEdit: true,
       adminOnly: false
     },
     {
       key: 'blacklist',
       name: 'Blacklist Domains or Ips',
-      description: 'List of domains or Ips that you never want to send to Domain Tools',
+      description: 'List of domains that you never want to send to Domain Tools',
       default: '',
       type: 'text',
       userCanEdit: false,
@@ -129,25 +133,6 @@ module.exports = {
       default: '',
       type: 'text',
       userCanEdit: false,
-      adminOnly: false
-    },
-    {
-      key: 'ipBlacklistRegex',
-      name: 'IP Black List Regex',
-      description: 'IPs that match the given regex will not be looked up (if blank, no IPs will be black listed)',
-      default: '',
-      type: 'text',
-      userCanEdit: false,
-      adminOnly: false
-    },
-    {
-      key: 'enrich',
-      name: 'DomainTools IRIS enrich API Access',
-      description:
-        'If checked, you are stating that you have access to DomainTools IRIS Enrich API. The Enrich API will be queried instead of Investigate.',
-      default: true,
-      type: 'boolean',
-      userCanEdit: true,
       adminOnly: false
     }
   ]
