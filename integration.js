@@ -152,6 +152,7 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
         });
       });
 
+      Logger.debug('Body is null');
       return cb(null, lookupResults);
     }
 
@@ -159,22 +160,11 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
       return cb('API Limit Exceeded');
     }
 
-    if (_.isNull(body) || _.isEmpty(body.response) || body.response.results_count === 0) {
-      entityList.forEach((entity) => {
-        lookupResults.push({
-          entity: entityLookup[entity],
-          data: null
-        });
-      });
-
-      Logger.debug('Body is null');
-      return cb(null, lookupResults);
-    }
-
     body.response.results.forEach((result) => {
       let lookupEntity = _getEntityObjFromResult(entityLookup, result);
+      
       if (lookupEntity) {
-        if (result.domain_risk.risk_score < options.minScore) {
+        if (!result.domain_risk.risk_score || result.domain_risk.risk_score <= options.minScore) {
           lookupResults.push({
             entity: lookupEntity,
             data: null
@@ -240,7 +230,10 @@ function _isLookupMiss(response, body) {
     response.statusCode === 500 ||
     response.statusCode === 400 ||
     response.statusCode === 503 ||
-    typeof body === 'undefined'
+    typeof body === 'undefined' ||
+    _.isNull(body) || 
+    _.isEmpty(body.response) || 
+    body.response.results_count === 0
   );
 }
 
