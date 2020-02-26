@@ -117,6 +117,15 @@ module.exports = {
       adminOnly: false
     },
     {
+      key: 'maxPivot',
+      name: 'Max Pivot',
+      description: 'The maximum number of pivots you want IRIS to show',
+      default: 500,
+      type: 'number',
+      userCanEdit: false,
+      adminOnly: false
+    },
+    {
       key: 'blacklist',
       name: 'Blacklist Domains or Ips',
       description: 'List of domains that you never want to send to Domain Tools',

@@ -176,6 +176,7 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
               summary: [],
               details: {
                 result,
+                maxPivot: options.maxPivot,
                 uri: WEB_EXTERNAL_URI + result.domain
               }
             }
