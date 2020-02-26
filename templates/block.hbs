@@ -5,75 +5,70 @@
 {{/if}}
 
 <div class="indicator">
-            <div class="tic-gauge-container">
-                <svg x="0" y="0" width="30%" height="30%" viewBox="0 0 55 50">
-                    <g transform="translate(28,25)">
-                        <g>
-                            <circle r="{{elementRadius}}" stroke="#eee" transform="rotate(-90)" fill="#fff"
-                                    stroke-width="{{elementStrokeWidth}}"
-                                    cx="0"
-                                    cy="0"></circle>
-                            {{!-- this is the inner circle --}}
-                            {{!-- stroke=<color> is the inner circle color --}}
-                            <circle stroke-dasharray="{{elementCircumference}}" r="{{elementRadius}}"
-                                    stroke="{{elementColor}}"
-                                    transform="rotate(-90)" fill="none"
-                                    stroke-dashoffset="{{elementStrokeOffset}}"
-                                    stroke-width="{{elementStrokeWidth}}" cx="0"
-                                    cy="0"></circle>
-                            <text text-anchor="middle" x="0" y="5" fill="{{elementColor}}"
-                                  font-size="13">{{result.domain_risk.risk_score}}</text>
-                        </g>
-                    </g>
-                </svg>
-            </div>
-        </div>
+  <div class="tic-gauge-container">
+    <svg x="0" y="0" width="30%" height="30%" viewBox="0 0 55 50">
+      <g transform="translate(28,25)">
+        <g>
+          <circle r="{{elementRadius}}" stroke="#eee" transform="rotate(-90)" fill="#fff"
+            stroke-width="{{elementStrokeWidth}}" cx="0" cy="0"></circle>
+          {{!-- this is the inner circle --}}
+          {{!-- stroke=<color> is the inner circle color --}}
+          <circle stroke-dasharray="{{elementCircumference}}" r="{{elementRadius}}" stroke="{{elementColor}}"
+            transform="rotate(-90)" fill="none" stroke-dashoffset="{{elementStrokeOffset}}"
+            stroke-width="{{elementStrokeWidth}}" cx="0" cy="0"></circle>
+          <text text-anchor="middle" x="0" y="5" fill="{{elementColor}}"
+            font-size="13">{{result.domain_risk.risk_score}}</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div>
 
-{{#if (and result.create_date.value (lte result.create_date.count block.data.details.maxPivot)) }}
-    <div>
-        <span class="p-key">Created Date: </span>
-        <span class="p-value">{{result.create_date.value}}</span>
-    </div>
+{{#if (and result.create_date.value (lt result.create_date.count block.data.details.maxPivot)) }}
+  <div>
+    <span class="p-key">Created Date: </span>
+    <span class="p-value">{{result.create_date.value}}</span>
+  </div>
 {{/if}}
 
-{{#if (and result.expiration_date.value (lte result.expiration_date.count block.data.details.maxPivot))}}
-    <div>
-        <span class="p-key">Expiration Date: </span>
-        <span class="p-value">{{result.expiration_date.value}}</span>
-    </div>
+{{#if (and result.expiration_date.value (lt result.expiration_date.count block.data.details.maxPivot))}}
+  <div>
+    <span class="p-key">Expiration Date: </span>
+    <span class="p-value">{{result.expiration_date.value}}</span>
+  </div>
 {{/if}}
 
 {{#if result.domain_risk.components}}
+  <div>
+    <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
+  </div>
+  
+  {{#each result.domain_risk.components as |risk|}}
     <div>
-        <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
+      <span class="p-key">Risk Name: </span>
+      <span class="p-value">{{risk.name}}</span>
     </div>
-
-    {{#each result.domain_risk.components as |risk|}}
-    <div>
-        <span class="p-key">Risk Name: </span>
-        <span class="p-value">{{risk.name}}</span>
-    </div>
-    {{/each}}
+  {{/each}}
 {{/if}}
 
-{{#if result.spf_info}}
+{{#if (and result.spf_info result.spf_info.length)}}
   <div>
     <span class="p-title">{{fa-icon "lock" fixedWidth=true}} SSL Information</span>
   </div>
   {{#each result.ssl_info as |ssl|}}
-    {{#if (and ssl.hash.value (lte ssl.hash.count block.data.details.maxPivot))}}
+    {{#if (and ssl.hash.value (lt ssl.hash.count block.data.details.maxPivot))}}
       <div>
           <span class="p-key"> SSL Hash: </span>
           <span class="p-value">{{ssl.hash.value}}</span>
       </div>
     {{/if}}
-    {{#if (and ssl.subject.value (lte ssl.subject.count block.data.details.maxPivot))}}
+    {{#if (and ssl.subject.value (lt ssl.subject.count block.data.details.maxPivot))}}
       <div>
           <span class="p-key"> SSL Subject: </span>
           <span class="p-value">{{ssl.subject.value}}</span>
       </div>
     {{/if}}
-    {{#if (and ssl.organization.value (lte ssl.organization.count block.data.details.maxPivot))}}
+    {{#if (and ssl.organization.value (lt ssl.organization.count block.data.details.maxPivot))}}
       <div>
           <span class="p-key"> SSL Organization: </span>
           <span class="p-value">{{ssl.organization.value}}</span>
@@ -82,13 +77,12 @@
   {{/each}}
 {{/if}}
 
-
-{{#if (and result.ip result.ip.length}}
+{{#if (and result.ip result.ip.length)}}
   <div>
     <span class="p-title">{{fa-icon "globe" fixedWidth=true}} IP Details</span>
   </div>
   {{#each result.ip as |ip|}}
-    {{#if (and ip.address.value (lte ip.address.count block.data.details.maxPivot))}}
+    {{#if (and ip.address.value (lt ip.address.count block.data.details.maxPivot))}}
       <div>
           <span class="p-key"> IP Address: </span>
           <span class="p-value">{{ip.address.value}}</span>
@@ -97,14 +91,14 @@
     {{#if (and ip.asn ip.asn.length)}}
       <div>
         {{#each ip.asn as |asn|}}
-          {{#if (and asn.value (lte asn.count block.data.details.maxPivot))}}
+          {{#if (and asn.value (lt asn.count block.data.details.maxPivot))}}
             <span class="p-key"> ASN: </span>
             <span class="p-value">{{asn.value}}</span>
           {{/if}}
         {{/each}}
       </div>
     {{/if}}
-    {{#if (and ip.isp.value (lte ip.isp.count block.data.details.maxPivot))}}
+    {{#if (and ip.isp.value (lt ip.isp.count block.data.details.maxPivot))}}
       <div>
           <span class="p-key"> ISP: </span>
           <span class="p-value">{{ip.isp.value}}</span>
@@ -119,13 +113,13 @@
   </div>
 
   {{#each result.mx as |mx|}}
-    {{#if (and mx.host.value (lte mx.host.count block.data.details.maxPivot))}}
+    {{#if (and mx.host.value (lt mx.host.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key"> MX Host: </span>
         <span class="p-value">{{mx.host.value}}</span>
       </div>
     {{/if}}
-    {{#if (and mx.domain.value (lte mx.domain.count block.data.details.maxPivot))}}
+    {{#if (and mx.domain.value (lt mx.domain.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key"> MX Domain: </span>
         <span class="p-value">{{mx.domain.value}}</span>
@@ -133,20 +127,19 @@
     {{/if}}
   {{/each}}
 {{/if}}
-
-{{#if (and (result.name_server result.name_server.length)}}
+{{#if (and result.name_server result.name_server.length)}}
   <div>
     <span class="p-title">{{fa-icon "server" fixedWidth=true}} Name Servers</span>
   </div>
 
   {{#each result.name_server as |name|}}
-    {{#if (and name.host.value (lte name.host.count block.data.details.maxPivot))}}
+    {{#if (and name.host.value (lt name.host.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key"> Name Server Host: </span>
         <span class="p-value">{{name.host.value}}</span>
       </div>
     {{/if}}
-    {{#if (and name.domain.value (lte name.domain.count block.data.details.maxPivot))}}
+    {{#if (and name.domain.value (lt name.domain.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key"> Name Server Domain: </span>
         <span class="p-value">{{name.domain.value}}</span>
@@ -154,13 +147,12 @@
     {{/if}}
     {{#if (and name.ip name.ip.length)}}
       <div>
-          {{#each name.ip as |ip|}}
-            {{#if (and ip.value (lte ip.count block.data.details.maxPivot))}}
-              <span class="p-key"> Name Server IP: </span>
-              <span class="p-value">{{ip.value}}</span>
-            {{/if}}
-          {{/each}}
-        {{/if}}
+        {{#each name.ip as |ip|}}
+          {{#if (and ip.value (lt ip.count block.data.details.maxPivot))}}
+            <span class="p-key"> Name Server IP: </span>
+            <span class="p-value">{{ip.value}}</span>
+          {{/if}}
+        {{/each}}
       </div>
     {{/if}}
   {{/each}}
@@ -171,59 +163,48 @@
   <span class="p-title">{{fa-icon "registered" fixedWidth=true}} Registration Details</span>
 </div>
 
-{{#if (and result.registrant_org.value (lte result.registrant_org.count block.data.details.maxPivot))}}
+{{#if (and result.registrant_org.value (lt result.registrant_org.count block.data.details.maxPivot))}}
   <div>
     <span class="p-key">Registrant Organization: </span>
     <span class="p-value">{{result.registrant_org.value}}</span>
   </div>
 {{/if}}
-
-{{#if (and result.registrar.value (lte result.registrar.count block.data.details.maxPivot))}}
+{{#if (and result.registrar.value (lt result.registrar.count block.data.details.maxPivot))}}
   <div>
     <span class="p-key">Registrar: </span>
     <span class="p-value">{{result.registrar.value}}</span>
   </div>
 {{/if}}
 
-{{#if (and result.registrant_contact.name.value (lte result.registrant_contact.name.count block.data.details.maxPivot))}}
+{{#if (and result.registrant_contact.name.value (lt result.registrant_contact.name.count block.data.details.maxPivot))}}
   <div>
     <span class="p-key"> Registrant Contact Name: </span>
     <span class="p-value">{{result.registrant_contact.name.value}}</span>
   </div>
 {{/if}}
 
-{{#if (and result.registrant_contact.org.value (lte result.registrant_contact.org.count block.data.details.maxPivot))}}
+{{#if (and result.registrant_contact.org.value (lt result.registrant_contact.org.count block.data.details.maxPivot))}}
   <div>
     <span class="p-key"> Registrant Contact Organization: </span>
     <span class="p-value">{{result.registrant_contact.org.value}}</span>
   </div>
 {{/if}}
 
-{{#if 
-  (and 
-    (and 
-      result.registrant_contact.city.value 
-      (lte result.registrant_contact.city.count block.data.details.maxPivot)
-    )
-    (and 
-      result.registrant_contact.country.value 
-      (lte result.registrant_contact.country.count block.data.details.maxPivot)
-    )
-  )
-}}
+{{#if (and (and result.registrant_contact.city.value (lt result.registrant_contact.city.count block.data.details.maxPivot))(and result.registrant_contact.country.value (lt result.registrant_contact.country.count block.data.details.maxPivot)))}}
   <div>
     <span class="p-key">Registrant Contact City and Country : </span>
     <span class="p-value">{{result.registrant_contact.city.value}}, {{result.registrant_contact.country.value}}</span>
   </div>
 {{/if}}
 
+
 <div>
   <span class="p-title">{{fa-icon "address-book" fixedWidth=true}} Contact Information</span>
 </div>
 
-{{#if (and result.email_domain result.email_domain.length}}
+{{#if (and result.email_domain result.email_domain.length)}}
   {{#each result.email_domain as |domain|}}
-    {{#if (and domain.value (lte domain.count block.data.details.maxPivot))}}
+    {{#if (and domain.value (lt domain.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key">Email Domain: </span>
         <span class="p-value">{{domain.value}}</span>
@@ -232,9 +213,9 @@
   {{/each}}
 {{/if}}
 
-{{#if (and result.soa_email result.soa_email.length}}
+{{#if (and result.soa_email result.soa_email.length)}}
   {{#each result.soa_email as |email|}}
-    {{#if (and email.value (lte email.count block.data.details.maxPivot))}}
+    {{#if (and email.value (lt email.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key"> SOA Email: </span>
         <span class="p-value">{{email.value}}</span>
@@ -243,9 +224,9 @@
   {{/each}}
 {{/if}}
 
-{{#if (and result.additional_whois_email result.additional_whois_email.length}}
+{{#if (and result.additional_whois_email result.additional_whois_email.length)}}
   {{#each result.additional_whois_email as |email|}}
-    {{#if (and email.value (lte email.count block.data.details.maxPivot))}}
+    {{#if (and email.value (lt email.count block.data.details.maxPivot))}}
       <div>
         <span class="p-key"> SOA Email: </span>
         <span class="p-value">{{email.value}}</span>
