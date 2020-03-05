@@ -162,7 +162,7 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
 
     body.response.results.forEach((result) => {
       let lookupEntity = _getEntityObjFromResult(entityLookup, result);
-      
+
       if (lookupEntity) {
         if (!result.domain_risk.risk_score || result.domain_risk.risk_score <= options.minScore) {
           lookupResults.push({
@@ -175,7 +175,15 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
             data: {
               summary: [],
               details: {
-                result,
+                result: {
+                  ...result,
+                  domain_risk: {
+                    ...result.domain_risk,
+                    components: result.domain_risk.components.filter(
+                      ({ risk_score }) => risk_score && risk_score >= options.minScore
+                    )
+                  }
+                },
                 maxPivot: options.maxPivot,
                 uri: WEB_EXTERNAL_URI + result.domain
               }
@@ -232,8 +240,8 @@ function _isLookupMiss(response, body) {
     response.statusCode === 400 ||
     response.statusCode === 503 ||
     typeof body === 'undefined' ||
-    _.isNull(body) || 
-    _.isEmpty(body.response) || 
+    _.isNull(body) ||
+    _.isEmpty(body.response) ||
     body.response.results_count === 0
   );
 }

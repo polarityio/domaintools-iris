@@ -42,13 +42,13 @@
   <div>
     <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
   </div>
-  
-  {{#each result.domain_risk.components as |risk|}}
-    <div>
-      <span class="p-key">Risk Name: </span>
-      <span class="p-value">{{risk.name}}</span>
-    </div>
-  {{/each}}
+  <div class="wrap-container">
+    {{#each result.domain_risk.components as |risk|}}
+      <span class="risk-container">
+        <span class="integration-text-color">{{risk.name}} ({{risk.risk_score}})</span>
+      </span>
+    {{/each}}
+  </div>
 {{/if}}
 
 {{#if (and result.spf_info result.spf_info.length)}}
