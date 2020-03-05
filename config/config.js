@@ -118,8 +118,8 @@ module.exports = {
     },
     {
       key: 'maxPivot',
-      name: 'Max Pivot',
-      description: 'The maximum number of pivots you want IRIS to show',
+      name: 'Maximum Iris Pivot',
+      description: 'The maximum number of pivots for linking out IRIS on a field',
       default: 500,
       type: 'number',
       userCanEdit: false,
