@@ -185,7 +185,8 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
                   }
                 },
                 maxPivot: options.maxPivot,
-                uri: WEB_EXTERNAL_URI + result.domain
+                entityUri: WEB_EXTERNAL_URI + result.domain,
+                baseUri: WEB_EXTERNAL_URI
               }
             }
           });
