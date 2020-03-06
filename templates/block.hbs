@@ -67,6 +67,11 @@
     {{#if ssl.hash.value}}
       <div>
         <span class="p-key"> SSL Hash: </span>
+        {{#if (lt ssl.subject.count block.data.details.maxPivot)}}
+          <a class="p-link" href="{{block.data.details.baseUri}}{{ ssl.hash.value}}">{{ ssl.hash.value}}</a>
+        {{else}}
+          <span class="p-value">{{ ssl.hash.value}}</span>
+        {{/if}}
       </div>
     {{/if}}
     {{#if ssl.subject.value}}

@@ -7,7 +7,7 @@ The Polarity DomainTools Iris integration allows Polarity to search Iris for ris
 More information on Iris:
 https://www.domaintools.com/products/iris
 
-<img width="350" alt="Example Integration" src="./assets/integration-example.png">
+<img width="400" alt="Example Integration" src="./assets/integration-example.png">
 
 
 ## Iris Integration Options
