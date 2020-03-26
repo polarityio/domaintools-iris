@@ -76,7 +76,7 @@ module.exports = {
     // If set to false, the integration will ignore SSL errors.  This will allow the integration to connect
     // to servers without valid SSL certificates.  Please note that we do NOT recommending setting this
     //to false in a production environment.
-    rejectUnauthorized: false
+    rejectUnauthorized: true
   },
   logging: {
     level: 'info' //trace, debug, info, warn, error, fatal
@@ -114,6 +114,15 @@ module.exports = {
       default: 0,
       type: 'number',
       userCanEdit: true,
+      adminOnly: false
+    },
+    {
+      key: 'maxPivot',
+      name: 'Maximum Iris Pivot',
+      description: 'The maximum number of pivots for linking out IRIS on a field',
+      default: 500,
+      type: 'number',
+      userCanEdit: false,
       adminOnly: false
     },
     {

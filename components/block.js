@@ -32,7 +32,11 @@ polarity.export = PolarityComponent.extend({
   elementCircumference: Ember.computed('elementCircumference', function() {
     return 2 * Math.PI * this.get('elementRadius');
   }),
-
+  actions: {
+    subtract(a, b) {
+      return a - b;
+    },
+  },
   _getStrokeOffset(ticScore, circumference) {
     let progress = ticScore / 100;
     return circumference * (1 - progress);
