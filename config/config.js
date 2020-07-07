@@ -127,7 +127,7 @@ module.exports = {
     },
     {
       key: 'blacklist',
-      name: 'Blacklist Domains or Ips',
+      name: 'Domains or IP Addresses to Ignore',
       description: 'List of domains that you never want to send to Domain Tools',
       default: '',
       type: 'text',
@@ -136,9 +136,8 @@ module.exports = {
     },
     {
       key: 'domainBlacklistRegex',
-      name: 'Domain Black List Regex',
-      description:
-        'Domains that match the given regex will not be looked up (if blank, no domains will be black listed)',
+      name: 'Domain Ignore List Regex',
+      description: 'Domains that match the given regex will not be looked up (if blank, no domains will be ignored)',
       default: '',
       type: 'text',
       userCanEdit: false,
