@@ -213,10 +213,11 @@
   {{/each}}
 {{/if}}
 
-
+{{#if hasRegistrationDetails}}
 <div>
   <span class="p-title">{{fa-icon "registered" fixedWidth=true}} Registration Details</span>
 </div>
+{{/if}}
 
 {{#if result.registrant_org.value}}
   <div>
@@ -266,7 +267,7 @@
   <div>
     <span class="p-key">Registrant Contact City and Country : </span>
     {{#if (and (lt result.registrant_contact.city.count block.data.details.maxPivot) (lt result.registrant_contact.country.count block.data.details.maxPivot))}}
-      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.city.value}}">{{result.registrant_contact.city.value}}</a>, 
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.city.value}}">{{result.registrant_contact.city.value}}</a>,
       <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.country.value}}">{{result.registrant_contact.country.value}}</a>
     {{else}}
       <span class="p-value">{{result.registrant_contact.city.value}}, {{result.registrant_contact.country.value}}</span>
