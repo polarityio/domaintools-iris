@@ -61,7 +61,7 @@ function doLookup(entities, options, cb) {
   async.each(
     entityLists,
     (entityList, next) => {
-      _lookupEntityInvestigate(entityList, entityLookup, options, function(err, results) {
+      _lookupEntityInvestigate(entityList, entityLookup, options, function (err, results) {
         if (err) {
           next(err);
         } else {
@@ -70,7 +70,7 @@ function doLookup(entities, options, cb) {
         }
       });
     },
-    function(err) {
+    function (err) {
       cb(err, lookupResults);
     }
   );
@@ -138,7 +138,7 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
 
   Logger.debug({ requestOptions }, 'Request Options');
 
-  requestWithDefaults(requestOptions, function(err, response, body) {
+  requestWithDefaults(requestOptions, function (err, response, body) {
     const errorObject = _isApiError(err, response, body, entityList);
     if (errorObject) {
       return cb(errorObject);
@@ -152,6 +152,7 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
         });
       });
 
+      Logger.debug('Body is null');
       return cb(null, lookupResults);
     }
 
@@ -159,22 +160,11 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
       return cb('API Limit Exceeded');
     }
 
-    if (_.isNull(body) || _.isEmpty(body.response) || body.response.results_count === 0) {
-      entityList.forEach((entity) => {
-        lookupResults.push({
-          entity: entityLookup[entity],
-          data: null
-        });
-      });
-
-      Logger.debug('Body is null');
-      return cb(null, lookupResults);
-    }
-
     body.response.results.forEach((result) => {
       let lookupEntity = _getEntityObjFromResult(entityLookup, result);
+      Logger.trace({ result }, 'lookup result');
       if (lookupEntity) {
-        if (result.domain_risk.risk_score < options.minScore) {
+        if (typeof result.domain_risk.risk_score === 'undefined' || result.domain_risk.risk_score < options.minScore) {
           lookupResults.push({
             entity: lookupEntity,
             data: null
@@ -185,8 +175,18 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
             data: {
               summary: [],
               details: {
-                result,
-                uri: WEB_EXTERNAL_URI + result.domain
+                result: {
+                  ...result,
+                  domain_risk: {
+                    ...result.domain_risk,
+                    components: result.domain_risk.components.filter(
+                      ({ risk_score }) => risk_score && risk_score >= options.minScore
+                    )
+                  }
+                },
+                maxPivot: options.maxPivot,
+                entityUri: WEB_EXTERNAL_URI + result.domain,
+                baseUri: WEB_EXTERNAL_URI
               }
             }
           });
@@ -240,7 +240,10 @@ function _isLookupMiss(response, body) {
     response.statusCode === 500 ||
     response.statusCode === 400 ||
     response.statusCode === 503 ||
-    typeof body === 'undefined'
+    typeof body === 'undefined' ||
+    _.isNull(body) ||
+    _.isEmpty(body.response) ||
+    body.response.results_count === 0
   );
 }
 

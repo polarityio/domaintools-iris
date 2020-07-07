@@ -76,7 +76,7 @@ module.exports = {
     // If set to false, the integration will ignore SSL errors.  This will allow the integration to connect
     // to servers without valid SSL certificates.  Please note that we do NOT recommending setting this
     //to false in a production environment.
-    rejectUnauthorized: false
+    rejectUnauthorized: true
   },
   logging: {
     level: 'info' //trace, debug, info, warn, error, fatal
@@ -117,9 +117,18 @@ module.exports = {
       adminOnly: false
     },
     {
+      key: 'maxPivot',
+      name: 'Maximum Iris Pivot',
+      description: 'The maximum number of pivots for linking out IRIS on a field',
+      default: 500,
+      type: 'number',
+      userCanEdit: false,
+      adminOnly: false
+    },
+    {
       key: 'blacklist',
-      name: 'Blacklist Domains or Ips',
-      description: 'List of domains that you never want to send to Domain Tools',
+      name: 'Ignored Domains',
+      description: 'Comma delimited list of domains that will not be searched',
       default: '',
       type: 'text',
       userCanEdit: false,
@@ -127,9 +136,8 @@ module.exports = {
     },
     {
       key: 'domainBlacklistRegex',
-      name: 'Domain Black List Regex',
-      description:
-        'Domains that match the given regex will not be looked up (if blank, no domains will be black listed)',
+      name: 'Ignored Domains Regex',
+      description: 'Domains that match the given regex will not be searched (if blank, no domains will be ignored)',
       default: '',
       type: 'text',
       userCanEdit: false,

@@ -1,220 +1,324 @@
-<a class="p-link" href="{{block.data.details.uri}}">  View in Iris {{fa-icon "external-link-square" class="external-icon"}} </a>
-|
-{{#if result.whois_url}}
-    <a class="p-link" href="{{result.whois_url}}">View Whois Data {{fa-icon "external-link-square" class="external-icon"}} </a>
-{{/if}}
+<a class="p-link" href="{{block.data.details.entityUri}}">  View in Iris {{fa-icon "external-link-square" class="external-icon"}} </a>
 
 <div class="indicator">
-            <div class="tic-gauge-container">
-                <svg x="0" y="0" width="30%" height="30%" viewBox="0 0 55 50">
-                    <g transform="translate(28,25)">
-                        <g>
-                            <circle r="{{elementRadius}}" stroke="#eee" transform="rotate(-90)" fill="#fff"
-                                    stroke-width="{{elementStrokeWidth}}"
-                                    cx="0"
-                                    cy="0"></circle>
-                            {{!-- this is the inner circle --}}
-                            {{!-- stroke=<color> is the inner circle color --}}
-                            <circle stroke-dasharray="{{elementCircumference}}" r="{{elementRadius}}"
-                                    stroke="{{elementColor}}"
-                                    transform="rotate(-90)" fill="none"
-                                    stroke-dashoffset="{{elementStrokeOffset}}"
-                                    stroke-width="{{elementStrokeWidth}}" cx="0"
-                                    cy="0"></circle>
-                            <text text-anchor="middle" x="0" y="5" fill="{{elementColor}}"
-                                  font-size="13">{{result.domain_risk.risk_score}}</text>
-                        </g>
-                    </g>
-                </svg>
-            </div>
-        </div>
+  <div class="tic-gauge-container">
+    <svg x="0" y="0" width="30%" height="30%" viewBox="0 0 55 50">
+      <g transform="translate(28,25)">
+        <g>
+          <circle r="{{elementRadius}}" stroke="#eee" transform="rotate(-90)" fill="#fff"
+            stroke-width="{{elementStrokeWidth}}" cx="0" cy="0"></circle>
+          {{!-- this is the inner circle --}}
+          {{!-- stroke=<color> is the inner circle color --}}
+          <circle stroke-dasharray="{{elementCircumference}}" r="{{elementRadius}}" stroke="{{elementColor}}"
+            transform="rotate(-90)" fill="none" stroke-dashoffset="{{elementStrokeOffset}}"
+            stroke-width="{{elementStrokeWidth}}" cx="0" cy="0"></circle>
+          <text text-anchor="middle" x="0" y="5" fill="{{elementColor}}"
+            font-size="13">{{result.domain_risk.risk_score}}</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div>
 
 {{#if result.create_date.value}}
-    <div>
-        <span class="p-key">Created Date: </span>
-        <span class="p-value">{{result.create_date.value}}</span>
-    </div>
+  <div>
+    <span class="p-key">Created Date: </span>
+    {{#if (lt result.create_date.count block.data.details.maxPivot)}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.create_date.value}}">{{result.create_date.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.create_date.value}}</span>
+    {{/if}}
+  </div>
 {{/if}}
 
 {{#if result.expiration_date.value}}
-    <div>
-        <span class="p-key">Expiration Date: </span>
-        <span class="p-value">{{result.expiration_date.value}}</span>
-    </div>
+  <div>
+    <span class="p-key">Expiration Date: </span>
+    {{#if (lt result.expiration_date.count block.data.details.maxPivot)}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.expiration_date.value}}">{{result.expiration_date.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.expiration_date.value}}</span>
+    {{/if}}
+  </div>
 {{/if}}
 
-{{#if result.domain_risk.components}}
-    <div>
-        <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
-    </div>
-
+{{#if (and result.domain_risk.components result.domain_risk.components.length)}}
+  <div>
+    <span class="p-title">{{fa-icon "exclamation" fixedWidth=true}} Risk Details</span>
+  </div>
+  <div class="wrap-container">
     {{#each result.domain_risk.components as |risk|}}
-    <div>
-        <span class="p-key">Risk Name: </span>
-        <span class="p-value">{{risk.name}}</span>
-    </div>
+      <span class="risk-container">
+        <span class="integration-text-color">{{risk.name}} ({{risk.risk_score}})</span>
+      </span>
     {{/each}}
+  </div>
 {{/if}}
 
-{{#if result.spf_info}}
-<div>
-  <span class="p-title">{{fa-icon "lock" fixedWidth=true}} SSL Information</span>
-</div>
-{{/if}}
-
-
-{{#if result.ssl_info}}
+{{#if (and result.spf_info result.spf_info.length)}}
+  <div>
+    <span class="p-title">{{fa-icon "lock" fixedWidth=true}} SSL Information</span>
+  </div>
   {{#each result.ssl_info as |ssl|}}
-    <div>
+    {{#if ssl.hash.value}}
+      <div>
         <span class="p-key"> SSL Hash: </span>
-        <span class="p-value">{{ssl.hash.value}}</span>
-    </div>
-    <div>
+        {{#if (lt ssl.subject.count block.data.details.maxPivot)}}
+          <a class="p-link" href="{{block.data.details.baseUri}}{{ ssl.hash.value}}">{{ ssl.hash.value}}</a>
+        {{else}}
+          <span class="p-value">{{ ssl.hash.value}}</span>
+        {{/if}}
+      </div>
+    {{/if}}
+    {{#if ssl.subject.value}}
+      <div>
         <span class="p-key"> SSL Subject: </span>
-        <span class="p-value">{{ssl.subject.value}}</span>
-    </div>
-
-    <div>
+        {{#if (lt ssl.subject.count block.data.details.maxPivot)}}
+          <a class="p-link" href="{{block.data.details.baseUri}}{{ssl.subject.value}}">{{ssl.subject.value}}</a>
+        {{else}}
+          <span class="p-value">{{ssl.subject.value}}</span>
+        {{/if}}
+      </div>
+    {{/if}}
+    {{#if ssl.organization.value}}
+      <div>
         <span class="p-key"> SSL Organization: </span>
-        <span class="p-value">{{ssl.organization.value}}</span>
-    </div>
+        {{#if (lt ssl.organization.count block.data.details.maxPivot)}}
+          <a class="p-link" href="{{block.data.details.baseUri}}{{ssl.organization.value}}">{{ssl.organization.value}}</a>
+        {{else}}
+          <span class="p-value">{{ssl.organization.value}}</span>
+        {{/if}}
+      </div>
+    {{/if}}
   {{/each}}
 {{/if}}
 
-<div>
-  <span class="p-title">{{fa-icon "globe" fixedWidth=true}} IP Details</span>
-</div>
-
-{{#if result.ip}}
+{{#if (and result.ip result.ip.length)}}
+  <div>
+    <span class="p-title">{{fa-icon "globe" fixedWidth=true}} IP Details</span>
+  </div>
   {{#each result.ip as |ip|}}
-    <div>
-        <span class="p-key"> IP Address: </span>
-        <span class="p-value">{{ip.address.value}}</span>
-    </div>
-    <div>
-        {{#if ip.asn}}
-        {{#each ip.asn as |asn|}}
-        <span class="p-key"> ASN: </span>
-        <span class="p-value">{{asn.value}}</span>
-        {{/each}}
-        {{/if}}
-    </div>
-    <div>
-        <span class="p-key"> ISP: </span>
-        <span class="p-value">{{ip.isp.value}}</span>
+    <div class="section">
+      {{#if ip.address.value}}
+        <div>
+          <span class="p-key"> IP Address: </span>
+          {{#if (lt ip.address.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{ip.address.value}}">{{ip.address.value}}</a>
+          {{else}}
+            <span class="p-value">{{ip.address.value}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#if (and ip.asn ip.asn.length)}}
+        <div>
+          <span class="p-key"> ASN: </span>
+          {{#each ip.asn as |asn index|}}
+            {{#if asn.value}}
+              {{#if (lt asn.count block.data.details.maxPivot)}}
+                <a class="p-link" href="{{block.data.details.baseUri}}{{asn.value}}">{{asn.value}}</a>,
+              {{else}}
+                <span class="p-value">{{asn.value}}</span>,
+              {{/if}}
+            {{/if}}
+          {{/each}}
+        </div>
+      {{/if}}
+      {{#if ip.isp.value}}
+        <div>
+          <span class="p-key"> ISP: </span>
+          {{#if (lt ip.isp.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{ip.isp.value}}">{{ip.isp.value}}</a>
+          {{else}}
+            <span class="p-value">{{ip.isp.value}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
     </div>
   {{/each}}
 {{/if}}
 
-{{#if result.mx}}
-    <div>
-      <span class="p-title">{{fa-icon "envelope" fixedWidth=true}} MX Details</span>
-    </div>
+{{#if (and result.mx result.mx.length)}}
+  <div>
+    <span class="p-title">{{fa-icon "envelope" fixedWidth=true}} MX Details</span>
+  </div>
 
-    {{#each result.mx as |mx|}}
-    <div>
-        <span class="p-key"> MX Host: </span>
-        <span class="p-value">{{mx.host.value}}</span>
+  {{#each result.mx as |mx|}}
+    <div class="section">
+      {{#if mx.host.value}}
+        <div>
+          <span class="p-key"> MX Host: </span>
+          {{#if (lt mx.host.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{mx.host.value}}">{{mx.host.value}}</a>
+          {{else}}
+            <span class="p-value">{{mx.host.value}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#if mx.domain.value}}
+        <div>
+          <span class="p-key"> MX Domain: </span>
+          {{#if (lt mx.domain.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{mx.domain.value}}">{{mx.domain.value}}</a>
+          {{else}}
+            <span class="p-value">{{mx.domain.value}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
     </div>
-    <div>
-        <span class="p-key"> MX Domain: </span>
-        <span class="p-value">{{mx.domain.value}}</span>
-    </div>
-    {{/each}}
+  {{/each}}
 {{/if}}
 
-{{#if result.name_server}}
-    <div>
-      <span class="p-title">{{fa-icon "server" fixedWidth=true}} Name Servers</span>
-    </div>
+{{#if (and result.name_server result.name_server.length)}}
+  <div>
+    <span class="p-title">{{fa-icon "server" fixedWidth=true}} Name Servers</span>
+  </div>
 
-    {{#each result.name_server as |name|}}
-    <div>
-        <span class="p-key"> Name Server Host: </span>
-        <span class="p-value">{{name.host.value}}</span>
+  {{#each result.name_server as |name|}}
+    <div class="section">
+      {{#if name.host.value}}
+        <div>
+          <span class="p-key"> Name Server Host: </span>
+          {{#if (lt name.host.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{name.host.value}}">{{name.host.value}}</a>
+          {{else}}
+            <span class="p-value">{{name.host.value}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#if name.domain.value}}
+        <div>
+          <span class="p-key"> Name Server Domain: </span>
+          {{#if (lt name.domain.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{name.domain.value}}">{{name.domain.value}}</a>
+          {{else}}
+            <span class="p-value">{{name.domain.value}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#if (and name.ip name.ip.length)}}
+        <div>
+          <span class="p-key"> Name Server IP: </span>
+          {{#each name.ip as |ip index|}}
+            {{#if ip.value}}
+              {{#if (lt ip.count block.data.details.maxPivot)}}
+                <a class="p-link" href="{{block.data.details.baseUri}}{{ip.value}}">{{ip.value}}</a>,
+              {{else}}
+                <span class="p-value">{{ip.value}}</span>,
+              {{/if}}
+            {{/if}}
+          {{/each}}
+        </div>
+      {{/if}}
     </div>
-    <div>
-        <span class="p-key"> Name Server Domain: </span>
-        <span class="p-value">{{name.domain.value}}</span>
-    </div>
-    <div>
-        {{#if name.ip}}
-        {{#each name.ip as |ip|}}
-        <span class="p-key"> Name Server IP: </span>
-        <span class="p-value">{{ip.value}}</span>
-        {{/each}}
-        {{/if}}
-    </div>
-    {{/each}}
+  {{/each}}
 {{/if}}
 
-
+{{#if hasRegistrationDetails}}
 <div>
   <span class="p-title">{{fa-icon "registered" fixedWidth=true}} Registration Details</span>
 </div>
-
-{{#if result.registrant_org}}
-    <div>
-        <span class="p-key">Registrant Organization: </span>
-        <span class="p-value">{{result.registrant_org.value}}</span>
-    </div>
 {{/if}}
 
-{{#if result.registrar}}
-    <div>
-        <span class="p-key">Registrar: </span>
-        <span class="p-value">{{result.registrar.value}}</span>
-    </div>
+{{#if result.registrant_org.value}}
+  <div>
+    <span class="p-key">Registrant Organization: </span>
+    {{#if (lt result.registrant_org.count block.data.details.maxPivot)}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_org.value}}">{{result.registrant_org.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.registrant_org.value}}</span>
+    {{/if}}
+  </div>
+{{/if}}
+
+{{#if result.registrar.value}}
+  <div>
+    <span class="p-key">Registrar: </span>
+    {{#if (lt result.registrar.count block.data.details.maxPivot)}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrar.value}}">{{result.registrar.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.registrar.value}}</span>
+    {{/if}}
+  </div>
 {{/if}}
 
 {{#if result.registrant_contact.name.value}}
-    <div>
-        <span class="p-key"> Registrant Contact Name: </span>
-        <span class="p-value">{{result.registrant_contact.name.value}}</span>
-    </div>
+  <div>
+    <span class="p-key"> Registrant Contact Name: </span>
+    {{#if (lt result.registrant_contact.name.count block.data.details.maxPivot)}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.name.value}}">{{result.registrant_contact.name.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.registrant_contact.name.value}}</span>
+    {{/if}}
+  </div>
 {{/if}}
 
 {{#if result.registrant_contact.org.value}}
-    <div>
-        <span class="p-key"> Registrant Contact Organization: </span>
-        <span class="p-value">{{result.registrant_contact.org.value}}</span>
-    </div>
+  <div>
+    <span class="p-key"> Registrant Contact Organization: </span>
+    {{#if (lt result.registrant_contact.org.count block.data.details.maxPivot)}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.org.value}}">{{result.registrant_contact.org.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.registrant_contact.org.value}}</span>
+    {{/if}}
+  </div>
 {{/if}}
 
-{{#if result.registrant_contact.city.value}}
-    <div>
-        <span class="p-key">Registrant Contact City and Country : </span>
-        <span class="p-value">{{result.registrant_contact.city.value}}, {{result.registrant_contact.country.value}}</span>
-    </div>
+{{#if (and result.registrant_contact.city.value result.registrant_contact.country.value)}}
+  <div>
+    <span class="p-key">Registrant Contact City and Country : </span>
+    {{#if (and (lt result.registrant_contact.city.count block.data.details.maxPivot) (lt result.registrant_contact.country.count block.data.details.maxPivot))}}
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.city.value}}">{{result.registrant_contact.city.value}}</a>,
+      <a class="p-link" href="{{block.data.details.baseUri}}{{result.registrant_contact.country.value}}">{{result.registrant_contact.country.value}}</a>
+    {{else}}
+      <span class="p-value">{{result.registrant_contact.city.value}}, {{result.registrant_contact.country.value}}</span>
+    {{/if}}
+  </div>
 {{/if}}
+
 
 <div>
   <span class="p-title">{{fa-icon "address-book" fixedWidth=true}} Contact Information</span>
 </div>
 
-{{#if result.email_domain}}
-  {{#each result.email_domain as |domain|}}
-    <div>
-        <span class="p-key">Email Domain: </span>
-        <span class="p-value">{{domain.value}}</span>
-    </div>
-  {{/each}}
+{{#if (and result.email_domain result.email_domain.length)}}
+  <div>
+    <span class="p-key">Email Domain: </span>
+    {{#each result.email_domain as |domain index|}}
+      {{#if domain.value}}
+        {{#if (lt domain.count block.data.details.maxPivot)}}
+          <a class="p-link" href="{{block.data.details.baseUri}}{{domain.value}}">{{domain.value}}</a>,
+        {{else}}
+          <span class="p-value">{{domain.value}}</span>,
+        {{/if}}
+      {{/if}}
+    {{/each}}
+  </div>
 {{/if}}
 
-{{#if result.soa_email}}
-  {{#each result.soa_email as |email|}}
-    <div>
-        <span class="p-key"> SOA Email: </span>
-        <span class="p-value">{{email.value}}</span>
-    </div>
-  {{/each}}
-{{/if}}
-
-{{#if result.additional_whois_email}}
-  {{#each result.additional_whois_email as |email|}}
-    <div>
-        <span class="p-key"> SOA Email: </span>
-        <span class="p-value">{{email.value}}</span>
-    </div>
-  {{/each}}
+{{#if (or (and result.soa_email result.soa_email.length) (and result.additional_whois_email result.additional_whois_email.length))}}
+  <div>
+    <span class="p-key"> SOA Email: </span>
+    {{#if (and result.soa_email result.soa_email.length)}}
+      {{#each result.soa_email as |email index|}}
+        {{#if email.value}}
+          {{#if (lt email.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{email.value}}">{{email.value}}</a>,
+          {{else}}
+            <span class="p-value">{{email.value}}</span>,
+          {{/if}}
+        {{/if}}
+      {{/each}}
+    {{/if}}
+    {{#if (and result.additional_whois_email result.additional_whois_email.length)}}
+      {{#each result.additional_whois_email as |email index|}}
+        {{#if email.value}}
+          {{#if (lt email.count block.data.details.maxPivot)}}
+            <a class="p-link" href="{{block.data.details.baseUri}}{{email.value}}">{{email.value}}</a>,
+          {{else}}
+            <span class="p-value">{{email.value}}</span>,
+          {{/if}}
+        {{/if}}
+      {{/each}}
+    {{/if}}
+  </div>
 {{/if}}
