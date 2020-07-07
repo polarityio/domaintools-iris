@@ -28,11 +28,11 @@ Minimum risk score a threat needs to have in order to be displayed.
 
 The maximum number of pivots for linking out IRIS on a field.
 
-### Blacklist Domains or Ips
-Comma separated list of domains that you do not want to lookup in Iris.
+### Ignored Domains
+Comma delimited list of domains that will not be searched
 
-### Domain Black List Regex
-Domains that match a regular expression that you do not want to lookup in Iris.
+### Ignored Domains Regex
+Domains that match the given regex will not be searched (if blank, no domains will be ignored)
 
 ## Installation Instructions
 
