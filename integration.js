@@ -61,7 +61,7 @@ function doLookup(entities, options, cb) {
   async.each(
     entityLists,
     (entityList, next) => {
-      _lookupEntityInvestigate(entityList, entityLookup, options, function(err, results) {
+      _lookupEntityInvestigate(entityList, entityLookup, options, function (err, results) {
         if (err) {
           next(err);
         } else {
@@ -70,7 +70,7 @@ function doLookup(entities, options, cb) {
         }
       });
     },
-    function(err) {
+    function (err) {
       cb(err, lookupResults);
     }
   );
@@ -138,7 +138,7 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
 
   Logger.debug({ requestOptions }, 'Request Options');
 
-  requestWithDefaults(requestOptions, function(err, response, body) {
+  requestWithDefaults(requestOptions, function (err, response, body) {
     const errorObject = _isApiError(err, response, body, entityList);
     if (errorObject) {
       return cb(errorObject);
@@ -162,9 +162,9 @@ function _lookupEntityInvestigate(entityList, entityLookup, options, cb) {
 
     body.response.results.forEach((result) => {
       let lookupEntity = _getEntityObjFromResult(entityLookup, result);
-
+      Logger.trace({ result }, 'lookup result');
       if (lookupEntity) {
-        if (!result.domain_risk.risk_score || result.domain_risk.risk_score <= options.minScore) {
+        if (typeof result.domain_risk.risk_score === 'undefined' || result.domain_risk.risk_score < options.minScore) {
           lookupResults.push({
             entity: lookupEntity,
             data: null
