@@ -122,25 +122,25 @@ module.exports = {
       description: 'The maximum number of pivots for linking out IRIS on a field',
       default: 500,
       type: 'number',
-      userCanEdit: false,
+      userCanEdit: true,
       adminOnly: false
     },
     {
-      key: 'blacklist',
+      key: 'blocklist',
       name: 'Ignored Domains',
       description: 'Comma delimited list of domains that will not be searched',
       default: '',
       type: 'text',
-      userCanEdit: false,
+      userCanEdit: true,
       adminOnly: false
     },
     {
-      key: 'domainBlacklistRegex',
+      key: 'domainBlocklistRegex',
       name: 'Ignored Domains Regex',
       description: 'Domains that match the given regex will not be searched (if blank, no domains will be ignored)',
       default: '',
       type: 'text',
-      userCanEdit: false,
+      userCanEdit: true,
       adminOnly: false
     }
   ]
