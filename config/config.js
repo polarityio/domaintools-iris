@@ -113,8 +113,8 @@ module.exports = {
       description: 'Minimum score to display in the Polarity overlay window',
       default: 0,
       type: 'number',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'maxPivot',
@@ -122,8 +122,8 @@ module.exports = {
       description: 'The maximum number of pivots for linking out IRIS on a field',
       default: 500,
       type: 'number',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'blocklist',
@@ -131,7 +131,7 @@ module.exports = {
       description: 'Comma delimited list of domains that will not be searched',
       default: '',
       type: 'text',
-      userCanEdit: true,
+      userCanEdit: false,
       adminOnly: false
     },
     {
@@ -140,7 +140,7 @@ module.exports = {
       description: 'Domains that match the given regex will not be searched (if blank, no domains will be ignored)',
       default: '',
       type: 'text',
-      userCanEdit: true,
+      userCanEdit: false,
       adminOnly: false
     }
   ]
