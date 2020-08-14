@@ -113,8 +113,8 @@ module.exports = {
       description: 'Minimum score to display in the Polarity overlay window',
       default: 0,
       type: 'number',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'maxPivot',
@@ -123,10 +123,10 @@ module.exports = {
       default: 500,
       type: 'number',
       userCanEdit: false,
-      adminOnly: false
+      adminOnly: true
     },
     {
-      key: 'blacklist',
+      key: 'blocklist',
       name: 'Ignored Domains',
       description: 'Comma delimited list of domains that will not be searched',
       default: '',
@@ -135,7 +135,7 @@ module.exports = {
       adminOnly: false
     },
     {
-      key: 'domainBlacklistRegex',
+      key: 'domainBlocklistRegex',
       name: 'Ignored Domains Regex',
       description: 'Domains that match the given regex will not be searched (if blank, no domains will be ignored)',
       default: '',

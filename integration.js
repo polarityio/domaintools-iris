@@ -9,7 +9,7 @@ const fs = require('fs');
 let Logger;
 let requestWithDefaults;
 let previousDomainRegexAsString = '';
-let domainBlacklistRegex = null;
+let domainBlocklistRegex = null;
 
 const BASE_URI = 'https://api.domaintools.com/v1/iris-investigate';
 const MAX_DOMAIN_LABEL_LENGTH = 63;
@@ -17,16 +17,16 @@ const MAX_ENTITY_LENGTH = 100;
 const MAX_ENTITIES_TO_BULK_LOOKUP = 30;
 const WEB_EXTERNAL_URI = 'https://research.domaintools.com/iris/search/?q=';
 
-function _setupRegexBlacklists(options) {
-  if (options.domainBlacklistRegex !== previousDomainRegexAsString && options.domainBlacklistRegex.length === 0) {
-    Logger.debug('Removing Domain Blacklist Regex Filtering');
+function _setupRegexBlocklists(options) {
+  if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
+    Logger.debug('Removing Domain Blocklist Regex Filtering');
     previousDomainRegexAsString = '';
-    domainBlacklistRegex = null;
+    domainBlocklistRegex = null;
   } else {
-    if (options.domainBlacklistRegex !== previousDomainRegexAsString) {
-      previousDomainRegexAsString = options.domainBlacklistRegex;
-      Logger.debug({ domainBlacklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blacklist Regex');
-      domainBlacklistRegex = new RegExp(options.domainBlacklistRegex, 'i');
+    if (options.domainBlocklistRegex !== previousDomainRegexAsString) {
+      previousDomainRegexAsString = options.domainBlocklistRegex;
+      Logger.debug({ domainBlocklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blocklist Regex');
+      domainBlocklistRegex = new RegExp(options.domainBlocklistRegex, 'i');
     }
   }
 }
@@ -44,10 +44,10 @@ function doLookup(entities, options, cb) {
   let entityLookup = {};
   let entityLists = [];
 
-  _setupRegexBlacklists(options);
+  _setupRegexBlocklists(options);
 
   entities.forEach((entityObj) => {
-    if (_isInvalidEntity(entityObj) || _isEntityBlacklisted(entityObj, options)) {
+    if (_isInvalidEntity(entityObj) || _isEntityBlocklisted(entityObj, options)) {
       return;
     }
 
@@ -96,19 +96,19 @@ function _isInvalidEntity(entityObj) {
   return false;
 }
 
-function _isEntityBlacklisted(entityObj, options) {
-  const blacklist = options.blacklist;
+function _isEntityBlocklisted(entityObj, options) {
+  const blocklist = options.blocklist;
 
-  Logger.trace({ blacklist: blacklist }, 'checking to see what blacklist looks like');
+  Logger.trace({ blocklist: blocklist }, 'checking to see what blocklist looks like');
 
-  if (_.includes(blacklist, entityObj.value.toLowerCase())) {
+  if (_.includes(blocklist, entityObj.value.toLowerCase())) {
     return true;
   }
 
   if (entityObj.isDomain) {
-    if (domainBlacklistRegex !== null) {
-      if (domainBlacklistRegex.test(entityObj.value)) {
-        Logger.debug({ domain: entityObj.value }, 'Blocked BlackListed Domain Lookup');
+    if (domainBlocklistRegex !== null) {
+      if (domainBlocklistRegex.test(entityObj.value)) {
+        Logger.debug({ domain: entityObj.value }, 'Blocked BlockListed Domain Lookup');
         return true;
       }
     }
@@ -296,12 +296,12 @@ function validateOptions(userOptions, cb) {
     });
   }
 
-  if (typeof userOptions.domainBlacklistRegex.value === 'string' && userOptions.domainBlacklistRegex.value.length > 0) {
+  if (typeof userOptions.domainBlocklistRegex.value === 'string' && userOptions.domainBlocklistRegex.value.length > 0) {
     try {
-      new RegExp(userOptions.domainBlacklistRegex.value);
+      new RegExp(userOptions.domainBlocklistRegex.value);
     } catch (error) {
       errors.push({
-        key: 'domainBlacklistRegex',
+        key: 'domainBlocklistRegex',
         message: error.toString()
       });
     }
