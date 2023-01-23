@@ -1,0 +1,95 @@
+{
+  "name": "DomainTools IRIS",
+  "acronym": "IRIS",
+  "description": "DomainTools IRIS .",
+  "entityTypes": [
+    "domain"
+  ],
+  "styles": [
+    "./styles/iris.less"
+  ],
+  "defaultColor": "light-pink",
+  "block": {
+    "component": {
+      "file": "./components/block.js"
+    },
+    "template": {
+      "file": "./templates/block.hbs"
+    }
+  },
+  "summary": {
+    "component": {
+      "file": "./components/summary.js"
+    },
+    "template": {
+      "file": "./templates/summary.hbs"
+    }
+  },
+  "request": {
+    "cert": "",
+    "key": "",
+    "passphrase": "",
+    "ca": "",
+    "proxy": "",
+    "rejectUnauthorized": true
+  },
+  "logging": {
+    "level": "info"
+  },
+  "options": [
+    {
+      "key": "apiName",
+      "name": "API Username",
+      "description": "DomainTools API Username",
+      "default": "",
+      "type": "text",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "apiKey",
+      "name": "API Key",
+      "description": "DomainTools API Key",
+      "default": "",
+      "type": "password",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "minScore",
+      "name": "Minimum Iris Risk Score",
+      "description": "Minimum score to display in the Polarity overlay window",
+      "default": 0,
+      "type": "number",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "maxPivot",
+      "name": "Maximum Iris Pivot",
+      "description": "The maximum number of pivots for linking out IRIS on a field",
+      "default": 500,
+      "type": "number",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "blocklist",
+      "name": "Ignored Domains",
+      "description": "Comma delimited list of domains that will not be searched",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": false
+    },
+    {
+      "key": "domainBlocklistRegex",
+      "name": "Ignored Domains Regex",
+      "description": "Domains that match the given regex will not be searched (if blank, no domains will be ignored)",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": false
+    }
+  ]
+}
