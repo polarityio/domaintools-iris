@@ -1,0 +1,46 @@
+{
+  "root": {
+    "path": "",
+    "on_null": "return_empty"
+  },
+  "pipeline": [
+    {
+      "op": "copy",
+      "from": "result.domain_risk.risk_score",
+      "to": "reduced_results.domain_risk_score"
+    },
+    {
+      "op": "copy",
+      "from": "result.domain_risk.components[].name",
+      "to": "reduced_results.risk_component_names"
+    },
+    {
+      "op": "copy",
+      "from": "result.create_date.value",
+      "to": "reduced_results.create_date"
+    },
+    {
+      "op": "copy",
+      "from": "result.registrant_org.value",
+      "to": "reduced_results.registrant_org"
+    },
+    {
+      "op": "copy",
+      "from": "result.ip[].asn",
+      "to": "reduced_results.ip_asn_data"
+    },
+    {
+      "op": "copy",
+      "from": "result.ssl_info[].subject.value",
+      "to": "reduced_results.ssl_subjects"
+    },
+    {
+      "op": "prune",
+      "strategy": "empty_values",
+      "target": "reduced_results"
+    }
+  ],
+  "output": {
+    "result": "$working.reduced_results"
+  }
+}

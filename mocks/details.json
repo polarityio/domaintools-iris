@@ -1,0 +1,210 @@
+{
+  "result": {
+    "domain": "malicious-example.com",
+    "domain_risk": {
+      "risk_score": 87,
+      "components": [
+        {
+          "name": "proximity",
+          "risk_score": 82,
+          "count": 245
+        },
+        {
+          "name": "threat_profile",
+          "risk_score": 94,
+          "count": 12
+        },
+        {
+          "name": "malware",
+          "risk_score": 89,
+          "count": 8
+        }
+      ]
+    },
+    "create_date": {
+      "value": "2023-05-12",
+      "count": 1523
+    },
+    "expiration_date": {
+      "value": "2024-05-12",
+      "count": 892
+    },
+    "registrant_org": {
+      "value": "Suspicious Registration Services",
+      "count": 34
+    },
+    "registrant_contact": {
+      "email": {
+        "value": "privacy@example.com",
+        "count": 567
+      },
+      "name": {
+        "value": "John Doe",
+        "count": 123
+      }
+    },
+    "registrar": {
+      "value": "NameCheap Inc.",
+      "count": 4532
+    },
+    "ip": [
+      {
+        "address": {
+          "value": "185.220.101.42",
+          "count": 89
+        },
+        "asn": [
+          {
+            "value": "AS31898",
+            "count": 234
+          },
+          {
+            "value": "AS64512",
+            "count": 45
+          }
+        ],
+        "isp": {
+          "value": "Oracle Corporation",
+          "count": 1523
+        },
+        "country_code": {
+          "value": "US",
+          "count": 8234
+        }
+      },
+      {
+        "address": {
+          "value": "185.220.101.43",
+          "count": 67
+        },
+        "asn": [
+          {
+            "value": "AS31898",
+            "count": 234
+          }
+        ],
+        "isp": {
+          "value": "Oracle Corporation",
+          "count": 1523
+        }
+      }
+    ],
+    "ssl_info": [
+      {
+        "subject": {
+          "value": "malicious-example.com",
+          "count": 1
+        },
+        "hash": {
+          "value": "5f3a8d9c2e1b4a6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c",
+          "count": 1
+        },
+        "organization": {
+          "value": "Let's Encrypt",
+          "count": 45678
+        },
+        "email": {
+          "value": "admin@malicious-example.com",
+          "count": 3
+        },
+        "duration": {
+          "value": 90,
+          "count": 234
+        }
+      },
+      {
+        "subject": {
+          "value": "*.malicious-example.com",
+          "count": 1
+        },
+        "hash": {
+          "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+          "count": 1
+        },
+        "organization": {
+          "value": "Let's Encrypt",
+          "count": 45678
+        }
+      }
+    ],
+    "mx": [
+      {
+        "host": {
+          "value": "mail.malicious-example.com",
+          "count": 23
+        },
+        "domain": {
+          "value": "malicious-example.com",
+          "count": 45
+        },
+        "ip": [
+          {
+            "value": "185.220.101.42",
+            "count": 89
+          }
+        ],
+        "priority": 10
+      }
+    ],
+    "name_server": [
+      {
+        "host": {
+          "value": "ns1.malicious-example.com",
+          "count": 12
+        },
+        "domain": {
+          "value": "malicious-example.com",
+          "count": 45
+        },
+        "ip": [
+          {
+            "value": "185.220.101.42",
+            "count": 89
+          }
+        ]
+      },
+      {
+        "host": {
+          "value": "ns2.malicious-example.com",
+          "count": 12
+        },
+        "domain": {
+          "value": "malicious-example.com",
+          "count": 45
+        }
+      }
+    ],
+    "spf_info": {
+      "value": "v=spf1 include:_spf.google.com ~all",
+      "count": 234
+    },
+    "active": true,
+    "redirect_domain": {
+      "value": "phishing-site.com",
+      "count": 5
+    },
+    "tags": [
+      "phishing",
+      "malware",
+      "suspicious"
+    ],
+    "popularity_rank": 2847392,
+    "monitor_status": "active",
+    "whois_url": "https://whois.domaintools.com/malicious-example.com",
+    "raw_text": "Full WHOIS text would be here...",
+    "history": {
+      "nameserver": {
+        "count": 5
+      },
+      "registrar": {
+        "count": 2
+      },
+      "ip_address": {
+        "count": 8
+      }
+    }
+  },
+  "maxPivot": 500,
+  "entityUri": "https://research.domaintools.com/iris/search/?q=malicious-example.com",
+  "baseUri": "https://research.domaintools.com/iris/search/?q="
+}
